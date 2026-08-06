@@ -80,14 +80,46 @@
   .modal-ok{background:var(--accent);border:none;color:#fff;padding:8px 18px;border-radius:3px;font-size:13px;cursor:pointer;}
   .modal-ok:hover{filter:brightness(1.05);}
 
+  /* password gate */
+  .pw-overlay{
+    position:fixed;inset:0;background:rgba(32,33,34,.85);
+    display:flex;align-items:center;justify-content:center;z-index:200;padding:16px;
+  }
+  .pw-box{
+    background:#fff;max-width:340px;width:100%;border-radius:6px;
+    box-shadow:0 8px 30px rgba(0,0,0,.35);overflow:hidden;text-align:center;
+  }
+  .pw-head{background:var(--accent-soft);border-bottom:1px solid var(--accent);padding:14px 18px;}
+  .pw-head h2{margin:0;font-family:var(--serif);font-weight:normal;font-size:18px;color:#5c3d10;}
+  .pw-body{padding:18px;}
+  .pw-body input{width:100%;padding:8px 10px;font-size:14px;border:1px solid var(--border);border-radius:3px;box-sizing:border-box;}
+  .pw-error{color:#b3261e;font-size:12.5px;margin-top:8px;display:none;}
+  .pw-foot{padding:0 18px 18px;}
+  .pw-btn{background:var(--accent);border:none;color:#fff;padding:8px 18px;border-radius:3px;font-size:13px;cursor:pointer;width:100%;}
+  .pw-btn:hover{filter:brightness(1.05);}
+  body.locked > *:not(.pw-overlay){display:none;}
+
   @media (max-width:640px){
     main{padding:18px;}
     .infobox{float:none;width:100%;margin-left:0;}
   }
 </style>
 </head>
-<body>
-  <div class="modal-overlay" id="disclaimerModal">
+<body class="locked">
+  <div class="pw-overlay" id="pwGate">
+    <div class="pw-box">
+      <div class="pw-head"><h2>Zadejte heslo</h2></div>
+      <div class="pw-body">
+        <input type="password" id="pwInput" placeholder="Heslo" autofocus>
+        <div class="pw-error" id="pwError">Špatné heslo, zkus to znovu.</div>
+      </div>
+      <div class="pw-foot">
+        <button class="pw-btn" id="pwSubmit">Vstoupit</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="disclaimerModal" style="display:none;">
     <div class="modal-box">
       <div class="modal-head">
         <h2>Než budete pokračovat</h2>
@@ -188,6 +220,26 @@
       indexFotky = (indexFotky + 1) % fotky.length;
       document.getElementById('ibPhoto').src = fotky[indexFotky];
     }
+
+    var SPRAVNE_HESLO = '741269454848';
+    var pwGate = document.getElementById('pwGate');
+    var pwInput = document.getElementById('pwInput');
+    var pwError = document.getElementById('pwError');
+    var disclaimerModal = document.getElementById('disclaimerModal');
+
+    function zkusitHeslo(){
+      if(pwInput.value === SPRAVNE_HESLO){
+        pwGate.style.display = 'none';
+        document.body.classList.remove('locked');
+        disclaimerModal.style.display = 'flex';
+      } else {
+        pwError.style.display = 'block';
+        pwInput.value = '';
+        pwInput.focus();
+      }
+    }
+    document.getElementById('pwSubmit').addEventListener('click', zkusitHeslo);
+    pwInput.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ zkusitHeslo(); } });
 
     var modal = document.getElementById('disclaimerModal');
     function closeModal(){ modal.style.display = 'none'; }
