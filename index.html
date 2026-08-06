@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="cs">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>František Švadlenka – FriendPedia</title>
+<style>
+  :root{
+    --bg: #ffffff;
+    --bg-chrome: #f6f6f6;
+    --border: #c8ccd1;
+    --text: #202122;
+    --text-muted: #54595d;
+    --accent: #c8791f;
+    --accent-soft: #fbeee0;
+    --serif: Georgia, 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', serif;
+    --sans: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', Arial, sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:15px;line-height:1.6;}
+
+  header.topbar{
+    display:flex;align-items:center;gap:12px;
+    padding:10px 18px;border-bottom:1px solid var(--border);
+    background:var(--bg-chrome);flex-wrap:wrap;
+  }
+  .wordmark{display:flex;align-items:center;gap:10px;}
+  .wordmark .globe{
+    width:32px;height:32px;border-radius:50%;flex:none;
+    background:
+      conic-gradient(from 0deg,#c8791f 0 40deg,#e0a45c 40deg 90deg,#8a5a2b 90deg 140deg,
+      #c8791f 140deg 180deg,#e0a45c 180deg 230deg,#8a5a2b 230deg 280deg,#c8791f 280deg 320deg,#e0a45c 320deg 360deg);
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,.15);
+  }
+  .wordmark .title{font-family:var(--serif);font-size:20px;line-height:1;}
+  .wordmark .title small{display:block;font-family:var(--sans);font-size:10px;letter-spacing:.04em;color:var(--text-muted);margin-top:3px;}
+
+  main{max-width:900px;margin:0 auto;padding:26px 34px 60px;}
+
+  h1.pagetitle{font-family:var(--serif);font-weight:normal;font-size:34px;border-bottom:1px solid var(--border);padding-bottom:8px;margin:0 0 4px;}
+  .pagesub{color:var(--text-muted);font-size:13px;margin:0 0 18px;font-style:italic;}
+
+  .infobox{float:right;width:270px;margin:0 0 16px 20px;border:1px solid var(--border);background:var(--bg-chrome);font-size:12.5px;}
+  .infobox .ib-title{font-family:var(--serif);font-size:18px;text-align:center;padding:8px;border-bottom:1px solid var(--border);}
+  .infobox .ib-photo{width:100%;aspect-ratio:4/3;background:#e9e9e9;display:block;object-fit:cover;object-position:center;}
+  .infobox .ib-subtitle{padding:6px 8px;text-align:center;font-style:italic;border-bottom:1px solid var(--border);}
+  .infobox table{width:100%;border-collapse:collapse;}
+  .infobox td{padding:5px 8px;border-top:1px solid var(--border);vertical-align:top;}
+  .infobox td.k{width:38%;color:var(--text-muted);font-weight:600;}
+
+  .toc{display:inline-block;background:var(--bg-chrome);border:1px solid var(--border);padding:10px 18px;margin-bottom:16px;font-size:13.5px;}
+  .toc-title{font-weight:bold;margin-bottom:6px;}
+  .toc ol{margin:0;padding-left:18px;}
+
+  .article h2{font-family:var(--serif);font-weight:normal;font-size:22px;border-bottom:1px solid var(--border);margin:26px 0 8px;}
+  .article h3{font-family:var(--serif);font-weight:normal;font-size:18px;margin:18px 0 6px;}
+  .article p{margin:0 0 12px;}
+  .article ul{margin:0 0 12px;padding-left:22px;}
+  .article blockquote{margin:0 0 12px;padding:8px 14px;border-left:3px solid var(--accent);background:var(--accent-soft);font-style:italic;}
+  .citeneeded{color:var(--accent);font-size:11px;vertical-align:super;cursor:help;}
+  .clearfix{clear:both;}
+
+  footer.pagefoot{max-width:900px;margin:0 auto;padding:20px 34px;color:var(--text-muted);font-size:12px;border-top:1px solid var(--border);}
+
+  /* disclaimer modal */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(32,33,34,.55);
+    display:flex;align-items:center;justify-content:center;z-index:100;padding:16px;
+  }
+  .modal-box{
+    background:#fff;max-width:440px;width:100%;border-radius:6px;
+    box-shadow:0 8px 30px rgba(0,0,0,.25);overflow:hidden;
+  }
+  .modal-head{background:var(--accent-soft);border-bottom:1px solid var(--accent);padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .modal-head h2{margin:0;font-family:var(--serif);font-weight:normal;font-size:19px;color:#5c3d10;}
+  .modal-close{background:none;border:none;font-size:20px;line-height:1;cursor:pointer;color:#5c3d10;padding:2px 6px;}
+  .modal-body{padding:16px 18px;font-size:13.5px;color:var(--text);}
+  .modal-body p{margin:0 0 10px;}
+  .modal-foot{padding:12px 18px 18px;text-align:right;}
+  .modal-ok{background:var(--accent);border:none;color:#fff;padding:8px 18px;border-radius:3px;font-size:13px;cursor:pointer;}
+  .modal-ok:hover{filter:brightness(1.05);}
+
+  @media (max-width:640px){
+    main{padding:18px;}
+    .infobox{float:none;width:100%;margin-left:0;}
+  }
+</style>
+</head>
+<body>
+  <div class="modal-overlay" id="disclaimerModal">
+    <div class="modal-box">
+      <div class="modal-head">
+        <h2>Než budete pokračovat</h2>
+        <button class="modal-close" id="modalCloseX" aria-label="Zavřít">×</button>
+      </div>
+      <div class="modal-body">
+        <p><b>Tato stránka je smyšlená.</b> Jde o žertovnou stránku psanou pro zábavu mezi kamarády, napsanou ve stylu skutečné encyklopedie.</p>
+        <p>Žádné tvrzení na této stránce nemusí odpovídat realitě a nemělo by být bráno jako fakt o skutečné osobě.</p>
+      </div>
+      <div class="modal-foot">
+        <button class="modal-ok" id="modalOk">Rozumím, pokračovat</button>
+      </div>
+    </div>
+  </div>
+
+  <header class="topbar">
+    <div class="wordmark">
+      <div class="globe"></div>
+      <div class="title">FriendPedia<small>encyklopedie o mentálně narušených</small></div>
+    </div>
+  </header>
+
+  <main>
+    <h1 class="pagetitle">František Švadlenka</h1>
+    <p class="pagesub">Z FriendPedie, otevřené encyklopedie (kterou právě teď nikdo neupravuje)</p>
+
+    <div class="infobox">
+      <div class="ib-title">František Švadlenka</div>
+      <img class="ib-photo" id="ibPhoto" src="svadlas1.jpg" alt="František Švadlenka" onclick="cyklovatFotku()" style="cursor:pointer;">
+      <div style="text-align:center;font-size:10px;color:#999;padding:3px 4px 0;">klikni na fotku pro zobrazení kokota</div>
+      <div class="ib-subtitle">debil, kamarád, chodící troska</div>
+      <table>
+        <tr><td class="k">Přezdívka</td><td>„Švadlas“</td></tr>
+        <tr><td class="k">Narozen</td><td>někdy, někde <span class="citeneeded" title="Tohle tvrzení nemá zdroj.">[citace potřeba]</span></td></tr>
+        <tr><td class="k">Diagnóza</td><td>porucha autistického spektra, demence</td></tr>
+        <tr><td class="k">Vzdělání</td><td>základní škola (nedokončeno), prospěch podprůměrný</td></tr>
+        <tr><td class="k">Povolání</td><td>nezaměstnaný</td></tr>
+        <tr><td class="k">Rodinný stav</td><td>svobodný</td></tr>
+        <tr><td class="k">Rodina</td><td>adoptovaný</td></tr>
+        <tr><td class="k">Doprava</td><td>motocykl</td></tr>
+      </table>
+    </div>
+
+    <div class="toc">
+      <div class="toc-title">Obsah</div>
+      <ol>
+        <li><a href="#raby-zivot">Raný život</a></li>
+        <li><a href="#vzdelani">Vzdělání</a></li>
+        <li><a href="#kariera">Kariéra</a></li>
+        <li><a href="#osobni-zivot">Osobní život</a></li>
+        <li><a href="#zdravotni-stav">Zdravotní stav</a></li>
+        <li><a href="#zajimavosti">Zajímavosti</a></li>
+        <li><a href="#citaty">Citáty</a></li>
+      </ol>
+    </div>
+
+    <div class="article">
+      <h2 id="raby-zivot">Raný život</h2>
+      <p>František Švadlenka, přezdívaný <b>Švadlas</b>, je adoptovaný; okolnosti jeho raného dětství nejsou veřejně zdokumentovány <span class="citeneeded" title="Tohle tvrzení nemá zdroj.">[citace potřeba]</span>. Již od útlého věku je popisován jako osoba s výraznými a tvrdohlavými názory na téměř jakékoli téma.</p>
+
+      <h2 id="vzdelani">Vzdělání</h2>
+      <p>Švadlas navštěvoval základní školu, kterou nedokončil. Během školní docházky vykazoval podprůměrný prospěch. V pozdějším věku mu byla diagnostikována porucha autistického spektra 3. stupně, se kterou je podle jeho okolí spojena i řada jeho charakteristických rysů, včetně minimální nebo žádné řeči.</p>
+
+      <h2 id="kariera">Kariéra</h2>
+      <p>Švadlas je v současnosti nezaměstnaný a v minulosti nikdy nevykonával placené zaměstnání. Jedinou zaznamenanou pracovní zkušeností je příležitostná výpomoc strýci, jejíž přesná náplň není blíže specifikována.</p>
+
+      <h2 id="osobni-zivot">Osobní život</h2>
+      <p>Švadlas je svobodný. V minulosti měl dva vztahy, z nichž ani jeden netrval déle než jeden měsíc. Je nerozlučně spjatý se skupinovou konverzací svých přátel, v níž je pravidelně ústřední postavou.</p>
+      <p>K přesunu využívá výhradně motocykl bez řidičského oprávnění. Ve vztahu k návykovým látkám je popisován jako nadměrný konzument alkoholu, konopí a dalších omamných a psychotropních látek.</p>
+
+      <h2 id="zdravotni-stav">Zdravotní stav</h2>
+      <p>Švadlas se dlouhodobě potýká s demencí, což se projevuje mimo jiné opakovaným vyprávěním stejných historek v krátkém časovém odstupu.</p>
+
+      <h2 id="zajimavosti">Zajímavosti</h2>
+      <ul>
+        <li>Tvrdí, že jednou potkal celebritu; toto tvrzení nebylo nezávisle potvrzeno. <span class="citeneeded" title="Tohle tvrzení nemá zdroj.">[citace potřeba]</span></li>
+        <li>Zastává pevný názor na správné pořadí, ve kterém se má jíst jídlo na talíři.</li>
+        <li>Podle vlastních slov dosud neprohrál žádnou společenskou hru.</li>
+        <li>Na schůzky přichází pravidelně s mírným zpožděním.</li>
+      </ul>
+
+      <h2 id="citaty">Citáty</h2>
+      <blockquote>„Já to tak neřekl.“ — Švadlas, o něčem, co přesně takhle řekl</blockquote>
+      <blockquote>„Tohle je poslední hra, pak jdu spát.“ — Švadlas, ve 2 ráno</blockquote>
+	<blockquote>„Ta látka nic nedělá.“ — Švadlas, skončil na záchytce</blockquote>
+    </div>
+    <div class="clearfix"></div>
+  </main>
+
+  <footer class="pagefoot">
+    Tato stránka je statická a needitovatelná — obsah je pevně daný v souboru. Není propojena se skutečnou Wikipedií ani s žádnou jinou encyklopedií a nejde o skutečné informace.
+  </footer>
+
+  <script>
+    var fotky = ['svadlas1.jpg', 'svadlas2.jpg', 'svadlas3.jpg'];
+    var indexFotky = 0;
+    function cyklovatFotku(){
+      indexFotky = (indexFotky + 1) % fotky.length;
+      document.getElementById('ibPhoto').src = fotky[indexFotky];
+    }
+
+    var modal = document.getElementById('disclaimerModal');
+    function closeModal(){ modal.style.display = 'none'; }
+    document.getElementById('modalOk').addEventListener('click', closeModal);
+    document.getElementById('modalCloseX').addEventListener('click', closeModal);
+    modal.addEventListener('click', function(e){ if(e.target === modal) closeModal(); });
+  </script>
+</body>
+</html>
